@@ -16,7 +16,6 @@ book:
   author: "Mike"
   date: today
   chapters:
-    - index.qmd
     - SizeDisExplanation.qmd
 
 format:
