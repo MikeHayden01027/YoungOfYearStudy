@@ -13,7 +13,7 @@ comments:
 
 book:
   title: "Make a book"
-  author: "Ben Letcher"
+  author: "Mike"
   date: today
   chapters:
     - index.qmd
