@@ -1,0 +1,1029 @@
+---
+title: "Yong-of-year (YOY) Brook Troug (*Salvelinus fontinalis*) Body Size Model"
+format: 
+  html: 
+    self-contained: true
+    toc: true
+editor: visual
+---
+
+```{r}
+#| echo: false
+#| message: false
+#| warning: false
+#| include: false
+
+# =============
+# Load Packages
+# =============
+
+library(ggthemes)
+library(here)
+library(grid)
+library(lubridate)
+library(scales)
+library(tidyverse)
+library(weathermetrics)
+
+source(here::here("DataAnalysis" , "Code" , "Functions", "themePublication.R"))
+source(here::here("DataAnalysis" , "Code" , "Functions", "otolithDateCalculations.R"))
+
+
+```
+
+```{r}
+#| echo: false
+#| message: false
+#| warning: false
+
+# -----------------------
+# Load Development Master
+# -----------------------
+
+develop <- read.csv( here::here( "DataAnalysis" , 
+                                 "DataOut" , 
+                                 "DevelopmentalRate" , 
+                                 "DIMaster" , 
+                                 "DIMaster.csv") ) %>%
+          filter( study == "TU New Hampshire Extended" )
+
+# ----------------------------------------------
+# Conceptual Model Growth Rate Vs Emergence Date
+# ----------------------------------------------
+
+SizeDisModel <- read.csv( here::here( "DataAnalysis" , 
+                                      "DataOut" , 
+                                      "ConceptualModels" , 
+                                      "EmergVsGrowth",
+                                      "SizeDisModel.csv")) %>%
+                mutate( slideNumber = as.factor(slideNumber), 
+                        dayofYear = as.numeric(dayofYear), 
+                        forkLength = as.numeric(forkLength),
+                        model = ifelse(model == "sameEmerge" , "Same Emergence/Diff Growth",
+                                 ifelse(model == "differentEmergeSameG" , "Different Emergence/Same Growth" , "Mix"))) %>% 
+                group_by( slideNumber )
+
+# ---------------------
+# Load master temp data
+# ---------------------
+
+tempMasterDayMean <- readRDS( here::here( "DataAnalysis" , 
+                                           "DataOut" , 
+                                           "tempDataBase" , 
+                                           "tempMasterDayMean.rds" )) %>%
+                     mutate( detectionDate = ymd(detectionDate) ,
+                             dayOfYear = yday(detectionDate) , 
+                             temp_f = celsius.to.fahrenheit(temp)) %>%
+                     filter( river %in% c(  "Four Mile Brook" , 
+                                               "Pond Brook" , 
+                                               "Obear Brook" , 
+                                               "Roaring Brook" ,
+                                               "Sanderson Brook" ,
+                                               "West Whately Brook"))
+
+# -----------------
+# Otolith Data Frame
+# -----------------
+
+ streamFishOtolithKey <- readRDS(here::here( "DataAnalysis" , 
+                                             "DataOut" , 
+                                             "Otolith" , 
+                                             "streamFishOtolithKey_Processed.rds" )) %>%
+                         filter( #river %in% c( "Four Mile Brook" , 
+                                              # "Pond Brook" , 
+                                             #  "Obear Brook" , 
+                                              # "Roaring Brook" ,
+                                              # "Sanderson Brook" ,
+                                              # "West Whately Brook"), 
+                                 #averageCount > 0 
+                           ) %>%
+                         mutate( forkLengthAtEye = 11, 
+                                 forkLengthAtEmerge = 20 ,
+                                 yearKilled = year(dateKilled) , 
+                                 methodOfCapture = ifelse( methodOfCapture == "Dip Net" , "Dip Net" , "Electrofisher" ))
+
+# --------------------
+# Otolith Ring Spacing
+# --------------------
+
+ringSpacing <- read.csv( here::here( "DataAnalysis" ,
+                                     "DataIn" , 
+                                     "Biological" , 
+                                     "Otolith" , 
+                                     "RingSpacing" , 
+                                     "ringSpacing_Master.csv")) %>% 
+              mutate( width_um = as.numeric(width_um) ) %>%
+              select( "slideNumber" , "width_um" , "ringNumber", "counts" )
+ 
+# --------------
+# Load Fish Data 
+# --------------
+
+  masterDataCurrent <- read_rds( here::here( "DataAnalysis" , 
+                                             "DataOut" , 
+                                             "MasterData" ,
+                                             "masterDataR.rds" ))
+
+# -----------
+# WB Evn Data
+# -----------
+
+load(file = here::here("DataAnalysis" , 
+                       "DataIn", 
+                       "Environmental" ,
+                       "WestBrookEvnData", 
+                       "envDataWB.RData")) 
+
+
+#envDataWB %>% mutate(date = ymd(date))
+```
+
+```{r}
+#| echo: false
+#| message: false
+#| warning: false
+
+# ================
+# Process Raw Data
+# ================
+
+# --------------------------------------------
+# Bind Developmental Index to Temperature Data 
+# --------------------------------------------
+
+tempPDevelopment <- tempMasterDayMean %>% filter( river %in% c( "Four Mile Brook" , 
+                                                                "Pond Brook" , 
+                                                                "Obear Brook" , 
+                                                                "Roaring Brook" ,
+                                                                "Sanderson Brook" ,
+                                                                "West Whately Brook"),
+                                                  ambientOrGround == "ambient" ) %>% 
+                                          group_by( river , 
+                                                    detectionDate ) %>%
+                                          summarise( temp_f = mean(temp_f) ) %>% 
+                                          mutate( temp_f = round(temp_f,  1),
+                                                  dayOfYear = yday(detectionDate)) %>%
+                                          left_join( develop , 
+                                                     by = c( "temp_f" = "temp_f" )) %>%
+                                          select( river , 
+                                                  detectionDate , 
+                                                  dayOfYear, 
+                                                  temp_f , 
+                                                  rate )
+
+westWOtolith <- streamFishOtolithKey %>% select( slideNumber , 
+                                                 eyeFormDate , 
+                                                 river , 
+                                                 slideNumber ) %>%
+                                          mutate( year = year(eyeFormDate) ) %>% 
+                                          group_by( slideNumber , 
+                                                    river ,
+                                                    year , 
+                                                    eyeFormDate ) %>%
+                                          nest() 
+
+
+# ===========
+# Life Events
+# ===========
+
+ # ----------
+ # Spawn Date  
+ # ----------
+
+
+ eyeToSpawn <- bind_rows(pmap( list( westWOtolith$eyeFormDate , 
+                                     westWOtolith$slideNumber ,
+                                     westWOtolith$river), 
+                                     spawnDate ))  %>%
+               group_by( slideNumber , river  )  %>%
+               summarise( detectionDate = (min(detectionDate)) - 8 ) %>%
+               mutate(lifeEvent = "Spawning", 
+                      forkLength = 0 ) %>%
+               ungroup()
+
+ # ------
+ # Eye Up 
+ # ------
+
+   eyeUp <- streamFishOtolithKey %>% rename( detectionDate = eyeFormDate ) %>%
+                                     mutate( dev = 50 , 
+                                             lifeEvent = "EyeUp" , 
+                                             forkLength = 11 ) %>%
+                                     select( slideNumber ,
+                                             river, 
+                                             detectionDate , 
+                                             lifeEvent , 
+                                             forkLength  )
+
+ 
+
+ # --------------
+ # Emergence Date
+ # --------------
+ 
+ eyeToEmerge <- bind_rows(pmap( list( eyeUp$detectionDate , 
+                                      eyeUp$slideNumber ,
+                                      eyeUp$river),
+                                  emergeDate )) %>% 
+                group_by( slideNumber , river  )  %>%
+                summarise(detectionDate = (max(detectionDate)) - 11 ) %>%
+                mutate(lifeEvent = "Emergence", 
+                       forkLength = 20 )  %>%
+                ungroup()
+   
+
+ # -----------
+ # Date Killed 
+ # -----------
+
+   dateKilled <- streamFishOtolithKey %>% rename( detectionDate = dateKilled ) %>%
+                                          mutate( dev = 100 , 
+                                                  lifeEvent = "DateKilled" , 
+                                                  forkLength = forkLength ) %>%
+                                          select( slideNumber ,
+                                                  river, 
+                                                  detectionDate , 
+                                                  lifeEvent , 
+                                                  forkLength  )
+
+
+  dateSac <- streamFishOtolithKey %>% select( slideNumber, 
+                                              dateKilled , 
+                                              methodOfCapture, 
+                                              radius,
+                                              otolithLength,
+                                              otolithPerimeter)
+  
+
+   lifeEventsMaster <- bind_rows( eyeToSpawn, 
+                                  eyeUp, 
+                                  eyeToEmerge,
+                                  dateKilled ) %>%
+                        left_join( dateSac, by = c("slideNumber" = "slideNumber")) %>% 
+                        mutate(dayOfYear = yday(detectionDate))
+           
+rm( tempMasterDayMean,
+    emergeDate,
+    spawnDate,
+    dateKilled, 
+    dateSac, 
+    eyeToEmerge, 
+    eyeUp , 
+    develop, 
+    eyeToSpawn, 
+    westWOtolith )
+
+# =======================
+# Growth Rate Calculation
+# =======================
+
+# ----------------------------------
+# Otolith Size and Fork Length Model 
+# ----------------------------------
+model <- lm(streamFishOtolithKey$forkLength~streamFishOtolithKey$radius)
+yInt <- summary(model)$coefficients[1,1]
+slope <- summary(model)$coefficients[2,1]
+
+
+# ----------------
+# Growth Rate Code
+# ----------------
+
+### Filter out otolith that have radius measurements
+ringSpacing5 <- ringSpacing %>% 
+  left_join( streamFishOtolithKey %>% 
+               select( slideNumber, 
+                       radius,
+                       forkLength,
+                       dateKilled), 
+             by = c('slideNumber' = 'slideNumber') ) %>% 
+  filter( radius > 0 ,
+          forkLength > 0, 
+          dateKilled > 0) %>% 
+  select( slideNumber, 
+          width_um, 
+          ringNumber, 
+          radius , counts)
+
+### Nest Data Frame and run function on it. 
+nestD <- ringSpacing5 %>% group_by(slideNumber, counts) %>% nest()
+
+growthRateOtolith <- bind_rows(pmap( list( nestD$slideNumber , 
+                                           nestD$counts ),
+                                           otolithLength )) %>%
+                     select( slideNumber, 
+                               Date, 
+                               finalForkLength,
+                               counts,
+                               ringNumber) %>%
+                    left_join( streamFishOtolithKey %>% select( slideNumber, 
+                                                                   river, 
+                                                                   site, 
+                                                                   mainStemOrBraid,
+                                                                   section,
+                                                                   methodOfCapture,
+                                                                   species,
+                                                                   yearKilled,
+                                                                   forkLength,
+                                                                   eyeFormDate) , 
+                                by = c('slideNumber' = 'slideNumber')) %>%
+                    group_by(slideNumber) %>%
+                    mutate( changeInSize =  round(abs(`finalForkLength` - lag(`finalForkLength`)),2 ), 
+                            week = week(Date)) %>%
+                    ungroup() 
+
+
+
+
+rm( tempMasterDayMean,
+      model, yInt, slope,
+      ed, ringSpacing5, nestD,
+      emergeDate,
+      spawnDate,
+      dateKilled, 
+      dateSac, 
+      eyeToEmerge, 
+      eyeUp , 
+      develop, 
+      eyeToSpawn, 
+      westWOtolith )
+
+ # ============
+ # Out Put Data
+ # ============
+
+      setwd(here::here( "DataAnalysis" , 
+                        "Code" , 
+                        "Shiny Applications" , 
+                        "Otolith" , 
+                        "Data" ))
+
+      write_rds( tempPDevelopment , file = "tempPDevelopment.rds" )
+       
+      write_rds( lifeEventsMaster , file = "lifeEventsMaster.rds")
+      
+      
+      setwd(here::here( "DataAnalysis" , 
+                        "DataOut" , 
+                        "predictedLifeEvents" ))
+
+      write_rds( tempPDevelopment , file = "tempPDevelopment.rds" )
+       
+      write_rds( lifeEventsMaster , file = "lifeEventsMaster.rds")
+      
+```
+
+![](DataAnalysis/Code/Raw%20Data%20Processing/Early%20Life%20Development/SizeDistribution/images/IMG_0065.jpeg)
+
+# Background
+
+-   The Ecology Section at the USGS Conte Laboratory has studied brook trout in West Brook, a small 3rd order stream in Whately MA, since 1997.
+
+-   They have observed body size variation in Young-of-the-Year (YOY) brook trout (*Salvelinus fontinalis*) in the fall. ( Photo above )
+
+-   What is causing the observed body size variation in YOY brook trout?
+
+# Variables
+
+1.  What effect does growth rate have on brook trout YOY body size?
+
+2.  What effect does emergence date ( birth ) have on brook trout YOY body size?
+
+# Conceptual Model
+
+## Simulated Data
+
+### Same Emergence Date - Different Growth Rate
+
+```{r}
+#| echo: false
+#| message: false
+#| warning: false
+
+SizeDisModel %>% filter( model == "Same Emergence/Diff Growth" ) %>%
+                 ggplot(aes( y = forkLength , 
+                             x = dayofYear, 
+                             group = slideNumber)) + 
+                  geom_point() + 
+                  geom_line() + 
+                  labs( x = "Emergence Date (Day of Year)" , 
+                        y = "Fork Length (mm)") + 
+                  theme_Publication() 
+
+```
+
+### Different Emergence Date - Same Growth Rate
+
+```{r}
+#| echo: false
+#| message: false
+#| warning: false
+
+SizeDisModel %>% filter( model == "Different Emergence/Same Growth" ) %>%
+                 ggplot(aes( y = forkLength , 
+                             x = dayofYear, 
+                             group = slideNumber)) + 
+                  geom_point() + 
+                  geom_line() + 
+                  labs( x = "Emergence Date (Day of Year)" , 
+                        y = "Fork Length (mm)") + 
+                  theme_Publication() 
+```
+
+### Different Emergence Date - Different Growth Rate
+
+```{r}
+#| echo: false
+#| message: false
+#| warning: false
+
+SizeDisModel %>% filter( model == "Mix" ) %>%
+                 ggplot(aes( y = forkLength , 
+                             x = dayofYear, 
+                             group = slideNumber)) + 
+                  geom_point() + 
+                  geom_line() + 
+                  labs( x = "Emergence Date (Day of Year)" , 
+                        y = "Fork Length (mm)") + 
+                  theme_Publication() 
+
+
+```
+
+## Simulated Data effect on Body Size
+
+### Growth Rate Vs Body Size
+
+```{r}
+#| echo: false
+#| message: false
+#| warning: false
+
+cc <- SizeDisModel %>% pivot_wider( names_from = event, 
+                                    values_from = c(forkLength, dayofYear)) %>%
+                       mutate( y1y2 = forkLength_dateKilled-forkLength_emergence,
+                               x1x2 = dayofYear_dateKilled-dayofYear_emergence, 
+                               slope = y1y2/x1x2)
+
+cc %>% ggplot(aes( y = forkLength_dateKilled, 
+                   x = slope)) + 
+        geom_point() + 
+        labs( x = "Growth Rate (mm per Day)" , 
+              y = "Fork Length (mm)") +
+        theme_Publication() + 
+        geom_smooth( method = lm, 
+                     se = FALSE )+
+        scale_colour_Publication()+
+        facet_wrap(.~model) 
+```
+
+### Emergence Date Vs Body Size
+
+```{r}
+#| echo: false
+#| message: false
+#| warning: false
+
+
+cc %>% ggplot(aes( y = forkLength_dateKilled, 
+                   x = dayofYear_emergence)) + 
+        geom_point() +
+        labs( x = "Emergence Date (Day of Year)" , 
+              y = "Fork Length (mm)") +
+        theme_Publication() + 
+        geom_smooth( method = lm, 
+                     se = FALSE )+
+        scale_colour_Publication()+
+        facet_wrap(.~model) 
+```
+
+# Stream Data
+
+## Obear Brook Size Distribution vs Emergence Date (2015-07-13)
+
+```{r}
+#| echo: false
+#| message: false
+#| warning: false
+
+ObearSumm2015 <- lifeEventsMaster %>% filter( river == "Obear Brook",
+                                              dateKilled == "2015-07-13",
+                                              lifeEvent %in% c( "DateKilled" , 
+                                                                "Emergence")) 
+ObearSumm2015 %>% ggplot( aes( y = forkLength , 
+                               x = dayOfYear,
+                               colour = as.factor(slideNumber)))+
+                    geom_point() +
+                    geom_line()+
+                    ggtitle("Obear Upper 2015/07/13") +
+                    labs( y = "Fork Length (mm)", 
+                          x = "Emergence Date (Day of Year)" ,
+                          colour = "Fish Number" ) +
+                    theme_Publication()
+
+
+```
+
+## Obear Brook Growth Rate vs. Size Distribution (2015-07-13)
+
+```{r}
+#| echo: false
+#| message: false
+#| warning: false
+
+cc <- lifeEventsMaster %>% filter( river == "Obear Brook",
+                            dateKilled == "2015-07-13",
+                            lifeEvent %in% c("DateKilled" , "Emergence")) %>%
+                            select(slideNumber, lifeEvent, forkLength, dayOfYear) %>%
+                            pivot_wider(names_from = lifeEvent, values_from = c(forkLength, dayOfYear)) %>%
+                            mutate( y1y2 = forkLength_DateKilled-forkLength_Emergence,
+                                    x1x2 = dayOfYear_DateKilled-dayOfYear_Emergence, 
+                                    slope = y1y2/x1x2) 
+                            
+
+cc %>% ggplot(aes( y = forkLength_DateKilled, 
+                   x = slope )) + 
+        geom_point() + 
+        labs( x = "Growth Rate (mm per Day)" , 
+              y = "Fork Length (mm)" ) +
+        geom_smooth( method = lm, se = FALSE ) +
+        theme_Publication()
+
+
+
+#summary(lm(cc$forkLength_DateKilled~cc$slope))
+```
+
+## Obear Brook Emergence vs. Size Distribution (2015-07-13)
+
+```{r}
+#| echo: false
+#| message: false
+#| warning: false
+
+cc %>% ggplot(aes( x = dayOfYear_Emergence, 
+                   y = forkLength_DateKilled )) + 
+        geom_point() + 
+        labs( x = "Emergence Date (DOY)" , 
+              y = "Fork Length (mm)" ) +
+        geom_smooth( method = lm, se = FALSE ) +
+        theme_Publication() 
+
+#summary(lm(cc$forkLength_DateKilled~cc$dayOfYear_Emergence))
+```
+
+## Interpretation
+
+1.  Brook Trout Length determines growth rate.
+
+2.  Need an independent measure of growth rate.
+
+3.  Use otolith ring spacing to estimate daily Growth Rate.
+
+# Growth Rate from Otolith Microstructure
+
+1.  Is there a relationship between otolith size (radius) and body size (fork length)
+
+2.  If there is we can measure the ring spacing along the radial axis and estimate fork length
+
+![](DataAnalysis/Code/Raw%20Data%20Processing/Early%20Life%20Development/SizeDistribution/images/3519_RingSpacing1-1_400xMagnification.png)
+
+## Otolith Radius vs Body Size
+
+1.  There is a positive relationship between otolith radius and fork length.
+    1.  R Squared = 0.8459
+2.  I will use this relationship to predict fork length for a given ring which correlates to a day.
+
+::: panel-tabset
+### All Samples
+
+```{r}
+#| echo: false
+#| message: false
+#| warning: false
+
+cc <- streamFishOtolithKey %>% mutate(newDOY = yday(dateKilled)) %>%
+                               filter(radius > 0, 
+                                      newDOY < 203)
+
+                         cc %>% ggplot(aes( y = forkLength , 
+                                            x = radius)) + 
+                                 geom_point() + 
+                                 geom_smooth( method=lm, 
+                                              se=FALSE ) + 
+                                 labs( y = "Fork Length (mm)" ,
+                                       x = "Otolith Radius (um)") + 
+                                # scale_colour_Publication() +
+                                 theme_Publication() + 
+                                 theme(axis.text.x = element_text(angle = 45, vjust = 0.5, hjust=1)) 
+                         
+```
+
+### Just Dip Net
+
+```{r}
+#| echo: false
+#| message: false
+#| warning: false
+
+
+ cc <- streamFishOtolithKey %>% mutate(newDOY = yday(dateKilled)) %>%
+                               filter(radius > 0, 
+                                      methodOfCapture == "Dip Net")
+
+                         cc %>% ggplot(aes( y = forkLength , 
+                                            x = radius)) + 
+                                 geom_point() + 
+                                 geom_smooth( method=lm, 
+                                              se=FALSE ) + 
+                                 labs( y = "Fork Length (mm)" ,
+                                       x = "Otolith Radius (um)", 
+                                       colour = "River") + 
+                                 scale_colour_Publication() +
+                                 theme_Publication() + 
+                                 theme(axis.text.x = element_text(angle = 45, vjust = 0.5, hjust=1))     
+```
+:::
+
+## Ring Spacing Methodology
+
+1.  A sagittal otolith is divided into four quadrants.
+    1.  Posterior-Ventral
+    2.  Posterior-Dorsal
+    3.  Anterior-Ventral
+    4.  Anterior-Dorsal
+2.  All Counting was done in the Posterior-Dorsal Quadrant.
+
+![](DataAnalysis/Code/Raw%20Data%20Processing/Early%20Life%20Development/SizeDistribution/images/Otolith_Quadrants.jpeg)
+
+3.  Ring spacing is measured along a 45 degree angle in the Posterior-Dorsal Quadrant
+    -   Starting at the Posterior most primordia of the primordium.
+    -   Ending at the edge of the Otolith.
+4.  This ensures consistent measurements among samples.
+
+![**Posterior-Dorsal Quadrant with Counting Line**](DataAnalysis/Code/Raw%20Data%20Processing/Early%20Life%20Development/SizeDistribution/images/Otolith_Measurment%20Angle.jpeg)
+
+5.  The distance between every consecutive ring was measured starting at the edge and ending at the posterior primordium.
+6.  The distances between the consecutive rings were used to calculate the otolith radius when the ring was formed.
+7.  The otolith radius is then run through a linear equation to calculate the Fishes Fork Length for a given rings size.
+
+![**Zoomed in Posterior-Dorsal Quadrant.**](DataAnalysis/Code/Raw%20Data%20Processing/Early%20Life%20Development/SizeDistribution/images/Otolith%20RingSpacing.jpeg)
+
+## Error Checking
+
+### Ring Measuring Error
+
+1.  Check for reader bias
+2.  Measure ring spacing and calculate estimated body size for Ten otolith blindly.
+3.  Compare the size estimates and calculate the percent error in them.
+4.  Percent Error should be below 10%
+5.  Two out of Ten percent error over 10%
+
+::: panel-tabset
+#### Graph
+
+```{r}
+#| echo: false
+#| message: false
+#| warning: false
+
+uni <- growthRateOtolith %>% filter(counts == 2)
+uni<- unique(uni$slideNumber)
+
+
+secondCount <- growthRateOtolith %>% 
+               filter(slideNumber %in% uni) %>% 
+               mutate(dOY = yday(Date))
+
+
+secondCount %>% ggplot(aes( y = finalForkLength , 
+                            x = dOY,
+                            colour = as.factor(counts))) + 
+                 geom_line() + 
+                 labs(y = "Fork Length (mm)" , x = "Day of Year", colour = "Count Number") + 
+                 facet_wrap(.~slideNumber) + 
+                 theme_Publication() +
+                 scale_colour_Publication() + 
+                 theme(axis.text.x = element_text(angle = 45, hjust = 1))
+
+
+```
+
+#### Results
+
+```{r}
+#| echo: false
+#| message: false
+#| warning: false
+
+sd <- secondCount %>% select( slideNumber, Date, finalForkLength, counts, ringNumber ) %>% 
+                      mutate( counts = ifelse(counts == 1 , "first" , "second") ) %>%
+                      pivot_wider( names_from = counts, values_from = finalForkLength ) %>%
+                      mutate( difference = (abs(((first + second)/2) - first) / ((first + second)/2)) * 100 ) 
+                              #new = first - di) 
+sd2 <- na.omit(sd)
+
+sd2 %>% group_by(slideNumber) %>% 
+        summarise( meanError = mean(difference))
+```
+:::
+
+### Autocorrolation
+
+```{r}
+#| echo: false
+#| message: false
+#| warning: false
+
+growthRateOtolithAvery <- growthRateOtolith %>% filter(river == "Avery Brook" , counts == 1  )
+
+
+nestedDate <- growthRateOtolithAvery %>% select( slideNumber) %>%
+                                    rename(sLideNumber = slideNumber) %>%
+                                    group_by(sLideNumber) %>% 
+                                    nest() %>% select(sLideNumber)
+
+newDate <- bind_rows(map( nestedDate$sLideNumber, autocorellation )) %>% 
+           left_join(streamFishOtolithKey , by = c("slideNumber" = "slideNumber")) %>% 
+           filter(data < 0.95)
+
+newDate %>% ggplot(aes( y = data , 
+                        x = lag , colour = as.factor(forkLength))) + 
+            geom_point() + facet_wrap(.~methodOfCapture) + theme_Publication() 
+
+```
+
+## Application to Stream Data
+
+### Avery Brook 2022
+
+#### Fish Caught
+
+```{r}
+#| echo: false
+#| message: false
+#| warning: false
+
+library(dataRetrieval)
+
+siteNo <- "01171000"
+pCode <- "00060"
+start.date <- "2022-03-01"
+end.date <- "2022-07-16"
+
+pheasant <- readNWISuv(siteNumbers = siteNo,
+                       parameterCd = pCode,
+                       startDate = start.date,
+                       endDate = end.date)
+
+
+
+
+Avery <- masterDataCurrent %>% filter( river == "Avery Brook" , 
+                                       year == 2022,
+                                       yearClass == 0,
+                                       detectionDate < "2022-08-01") %>%
+                                mutate(detectionDate = as.POSIXct( detectionDate, format="%Y-%m-%d"))
+
+
+GRO <- growthRateOtolith %>% filter( river == "Avery Brook" ,
+                                     finalForkLength > 20) %>% 
+                             mutate( Date = as.POSIXct( Date, format="%Y-%m-%d") ) 
+
+pheasant %>% ggplot( aes( y = X_00060_00000/2 , 
+                          x = dateTime)) + 
+            #  geom_line()  +
+             # geom_line( data = GRO, 
+                       #  aes( y = finalForkLength, 
+                         #     x = Date , 
+                          #    colour = methodOfCapture, 
+                             # group=slideNumber)) +
+              geom_point( data = Avery , aes( y = forkLength, 
+                                              x = detectionDate,
+                                              colour = methodOfCapture)) + 
+              labs( y = "Fork Length (mm)" , x = "Date" , colour = "Method of Capture" ) +
+              theme_Publication() +
+              scale_colour_Publication() 
+
+
+
+
+```
+
+#### Fish Caught with Predicted Growth Rates
+
+::: panel-tabset
+##### All Together
+
+```{r}
+#| echo: false
+#| message: false
+#| warning: false
+
+pheasant %>% ggplot( aes( y = X_00060_00000/2 , 
+                          x = dateTime)) + 
+            #  geom_line()  +
+              geom_line( data = GRO, 
+                         aes( y = finalForkLength, 
+                              x = Date , 
+                              colour = methodOfCapture, 
+                              group=slideNumber)) +
+              geom_point( data = Avery , aes( y = forkLength, 
+                                              x = detectionDate,
+                                              colour = methodOfCapture)) + 
+              labs( y = "Fork Length (mm)" , x = "Date" , colour = "Method of Capture" ) +
+              theme_Publication() +
+              scale_colour_Publication() 
+```
+
+##### Method of Capture
+
+```{r}
+#| echo: false
+#| message: false
+#| warning: false
+
+pheasant %>% ggplot( aes( y = X_00060_00000/2 , 
+                          x = dateTime)) + 
+            #  geom_line()  +
+              geom_line( data = GRO, 
+                         aes( y = finalForkLength, 
+                              x = Date , 
+                              colour = methodOfCapture, 
+                              group=slideNumber)) +
+              geom_point( data = Avery , aes( y = forkLength, 
+                                              x = detectionDate,
+                                              colour = methodOfCapture)) + 
+              labs( y = "Fork Length (mm)" , x = "Date" , colour = "Method of Capture" ) +
+              theme_Publication() +
+              scale_colour_Publication() + facet_wrap(.~methodOfCapture)
+```
+:::
+
+### Daily Growth Rate
+
+::: panel-tabset
+#### Electrofisher
+
+```{r}
+#| echo: false
+#| message: false
+#| warning: false
+
+testD <- growthRateOtolith %>% group_by(slideNumber) %>%
+                      mutate(new =  round(abs(`finalForkLength` - lag(`finalForkLength`)),2 ), 
+                             week = week(Date))
+
+testD %>% filter( new < 1, 
+                  river == "Avery Brook" , 
+                  methodOfCapture == "Electrofisher") %>% 
+          ggplot(aes( y = new, 
+                      x = Date, 
+                      colour = as.factor(slideNumber))) + 
+           geom_point() + 
+           labs( y = "Growth Rate (mm/Day" , x = "Date" ) +
+           facet_wrap(.~slideNumber)
+```
+
+#### Dip Net
+
+```{r}
+
+testD %>% filter( new < 1, 
+                  river == "Avery Brook",
+                  methodOfCapture == "Dip Net") %>% 
+          ggplot(aes( y = new, 
+                      x = Date, 
+                      colour = as.factor(slideNumber))) + 
+           geom_point() + 
+           labs( y = "Growth Rate (mm/Day" , x = "Date" ) +
+           facet_wrap(.~slideNumber)
+
+```
+:::
+
+### Comparisons
+
+::: panel-tabset
+#### Fork Length vs. Growth Rate
+
+```{r}
+#| echo: false
+#| message: false
+#| warning: false
+
+test1 <- growthRateOtolith %>% filter( river %in% c( "Avery Brook" )) %>% 
+                               select( slideNumber, 
+                                       Date, 
+                                       finalForkLength ,
+                                       river,
+                                       methodOfCapture) %>% 
+                               mutate( dOY = yday(Date) ) %>% 
+                               group_by(slideNumber, 
+                                         river,
+                                       methodOfCapture) %>% 
+                               summarise( y2 = max(finalForkLength),
+                                          y1 = min(finalForkLength),
+                                          x2 = max(dOY) ,
+                                          x1 = min(dOY)) %>% 
+                               mutate( slope = (y2-y1)/(x2-x1) ) %>% ungroup()
+
+test1 %>% 
+          ggplot(aes( x = slope , 
+                      y = y2 , 
+                      colour = methodOfCapture)) + 
+           geom_point() + 
+           geom_smooth(method = lm, se=FALSE) + 
+           labs( y = "Fork Length (mm)" , 
+                 x = "Growth Rate (mm/day)" , 
+                 colour = "Stream") +
+           #facet_wrap(.~methodOfCapture) +
+           theme_Publication() + 
+           scale_colour_Publication()
+```
+
+#### Emergence Date
+
+```{r}
+#| echo: false
+#| message: false
+#| warning: false
+
+
+test1 %>% 
+          ggplot(aes( x = x1 , 
+                      y = y2 , 
+                      colour = methodOfCapture)) + 
+           geom_point() + 
+           geom_smooth(method = lm, se=FALSE) + 
+           labs( y = "Fork Length (mm)" , 
+                 x = "Emergence Date (DOY)" , 
+                 colour = "Stream") +
+           #facet_wrap(.~methodOfCapture) +
+           theme_Publication() + 
+           scale_colour_Publication()
+```
+:::
+
+### Avery Brook Summer 2022 with Environmental Variables
+
+#### Discharge
+
+```{r}
+#| echo: false
+#| message: false
+#| warning: false
+
+library(dataRetrieval)
+
+siteNo <- "01171000"
+pCode <- "00060"
+start.date <- "2022-03-01"
+end.date <- "2022-07-16"
+
+pheasant <- readNWISuv(siteNumbers = siteNo,
+                       parameterCd = pCode,
+                       startDate = start.date,
+                       endDate = end.date)
+
+
+
+
+Avery <- masterDataCurrent %>% filter( river == "Avery Brook" , 
+                                       year == 2022,
+                                       yearClass == 0,
+                                       detectionDate < "2022-08-01") %>%
+                                mutate(detectionDate = as.POSIXct( detectionDate, format="%Y-%m-%d"))
+
+
+GRO <- growthRateOtolith %>% filter( river == "Avery Brook" ,
+                                     finalForkLength > 20) %>% 
+                             mutate( Date = as.POSIXct( Date, format="%Y-%m-%d") ) 
+
+pheasant %>% ggplot( aes( y = X_00060_00000/2 , 
+                          x = dateTime)) + 
+              geom_line()  +
+              geom_line( data = GRO, 
+                         aes( y = finalForkLength, 
+                              x = Date , 
+                              colour = methodOfCapture, 
+                              group=slideNumber)) +
+              geom_point( data = Avery , aes( y = forkLength, 
+                                              x = detectionDate )) + 
+              labs( y = "Fork Length (mm)" , x = "Date" , colour = "Fish Number" ) +
+              scale_y_continuous(
+    
+    # Features of the first axis
+    name = "First Axis",
+    
+    # Add a second axis and specify its features
+    sec.axis = sec_axis( trans=~.*2, name="Discharge (cfs)")
+  ) +
+  
+              theme_Publication() +
+              scale_colour_Publication() 
+
+
+
+```
