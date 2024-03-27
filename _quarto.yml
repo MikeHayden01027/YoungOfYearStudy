@@ -17,10 +17,7 @@ book:
   date: today
   chapters:
     - index.qmd
-    - intro.qmd
-    - summary.qmd
     - SizeDisExplanation.qmd
-    - references.qmd
 
 format:
   html:
