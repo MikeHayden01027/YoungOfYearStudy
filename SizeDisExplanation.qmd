@@ -60,9 +60,9 @@ SizeDisModel <- read.csv( here::here( "DataAnalysis" ,
                         dayofYear = as.numeric(dayofYear), 
                         forkLength = as.numeric(forkLength),
                         model = ifelse(model == "sameEmerge" , "Same Emergence/Diff Growth",
-                                 ifelse(model == "differentEmergeSameG" , "Different Emergence/Same Growth" , "Mix"))) %>% 
+                                 ifelse(model == "differentEmergeSameG" , "Different Emergence/Same Growth" , "Mix")),
+                        event = ifelse( forkLength == 20, "emergence" , "dateKilled" )) %>% 
                 group_by( slideNumber )
-
 # ---------------------
 # Load master temp data
 # ---------------------
