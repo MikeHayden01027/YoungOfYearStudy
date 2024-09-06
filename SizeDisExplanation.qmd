@@ -1,5 +1,5 @@
 ---
-title: "Yong-of-year (YOY) Brook Troug (*Salvelinus fontinalis*) Body Size Model"
+title: "Yong-of-the-year (YOY) Brook Trout (*Salvelinus fontinalis*) Body Size Model"
 format: 
   html: 
     self-contained: true
@@ -674,11 +674,11 @@ cc <- streamFishOtolithKey %>% mutate(newDOY = yday(dateKilled)) %>%
 
 ### Ring Measuring Error
 
-1.  Check for reader bias
+1.  Check for reader bias.
 2.  Measure ring spacing and calculate estimated body size for Ten otolith blindly.
 3.  Compare the size estimates and calculate the percent error in them.
-4.  Percent Error should be below 10%
-5.  Two out of Ten percent error over 10%
+4.  Percent Error should be below 10%.
+5.  Two out of Ten percent error over 10%.
 
 ::: panel-tabset
 #### Graph
@@ -688,7 +688,7 @@ cc <- streamFishOtolithKey %>% mutate(newDOY = yday(dateKilled)) %>%
 #| message: false
 #| warning: false
 
-uni <- growthRateOtolith %>% filter(counts == 2)
+uni <- growthRateOtolith %>% filter(counts == 1:2)
 uni<- unique(uni$slideNumber)
 
 

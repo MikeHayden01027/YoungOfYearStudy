@@ -12,8 +12,8 @@ comments:
     theme: clean
 
 book:
-  title: "Brook rout Young of The Year Study"
-  author: "Mike"
+  title: "Brook Trout Young of The Year Study"
+  author: "Michael James Hayden, MS"
   date: today
   chapters:
     - index.qmd
