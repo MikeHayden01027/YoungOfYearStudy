@@ -1,14 +1,20 @@
+---
+title: "Introduction"
+format: 
+  html: 
+    self-contained: true
+    toc: true
+editor: visual
+---
+
+![](DataAnalysis/DataIn/Images/IMG_0499.jpeg)
+
 # Introduction
 
-Guide to building a book in Quarto and publishing on github.io for Conte ecohydrology crew.
-  
-***  
+Climate change is one of the most significant global issues affecting people and ecosystems. The increased frequency of extreme climatic events, including droughts, floods, and storms, may affect whole ecosystems and specific species populations (Thibault & Brown, 2008). Therefore, it is crucial to predict the response of aquatic species to climate change to determine their future viability in a rapidly changing world (Kareiva et al., 1993; Shuter & Post, 1990).
 
-<button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#collapseOne" >Session Information</button><div id="collapseOne" class="accordion-collapse collapse"><div>
+Brook Trout (Salvelinus fontinalis) is a freshwater fish native to eastern North American lakes, rivers, and streams from northern Quebec to Georgia (Meisner, 1990). Brook Trout faces potentially drastic range decreases because of accelerating climate change, as their requirement for cold, pristine waters leaves them especially sensitive to rising water temperatures (Clark et al., 2001). Droughts can force juvenile brook trout into unfavorable habitats and scour redds. With climate change threatening brook trout persistence in their native range, more research on the impacts of stream discharge and temperature on brook trout presence is needed to protect and restore brook trout populations (Armstrong & Nislow, 2012; Riley et al., 2009).
 
-```{r}
-sessionInfo()
-```
+The juvenile life stage, more commonly known as the young-of-the-year (YOY), begins when Brook Trout fry emerges from the redds in the spring. This process continues until December 31st, after which YOY are considered age-1 or adult brook trout. According to several studies, the YOY life stage is the most crucial in determining the viability of the entire population. While a significant factor in establishing year-class abundance, little is known about how stream discharge and temperature influence YOY survival as well as the timing of early life events such as spawn, hatching, and emergence (Blum et al., 2018; Kanno et al., 2016). Thus, a more comprehensive understanding of how stream discharge and temperature influence the timing of these life history events is needed to manage Brook Trout streams better.
 
-</div></div>  
-
+In 2014, a preliminary pilot study was initiated to investigate the factors influencing YOY brook trout survival. Ecologists observed a considerable variation (ranging from 40mm to 90mm) in the body size of YOY brook trout during the spring and fall samples in West Brook. Numerous factors influence body size, including food availability, population density, and ambient temperature. The researchers decided to investigate the potential influence of hatch date and growth rate on the body size of individual YOY. The pilot study aimed to examine other factors that impact body size, such as high-resolution stream discharge and temperature data. The availability of new data has allowed ecologists to broaden their inquiry and examine the impact of stream discharge and temperature on the survival of YOY brook trout.
