@@ -17,6 +17,7 @@ book:
   date: today
   chapters:
     - index.qmd
+    - variationInEmergenceTiming.qmd
 
 format:
   html:
