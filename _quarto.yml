@@ -19,6 +19,7 @@ book:
     - index.qmd
     - variationInEmergenceTiming.qmd
     - OtolithRadiusForkLengthRelationship.qmd
+    - SizeDisExplanation.qmd 
 
 format:
   html:

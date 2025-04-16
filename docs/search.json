@@ -128,5 +128,115 @@
     "crumbs": [
       "<span class='chapter-number'>3</span>  <span class='chapter-title'>Effect of stream and year on the somatic-to-otolith size relationship of Juvenile Brook Trout (Salvelinus fontinalis).</span>"
     ]
+  },
+  {
+    "objectID": "SizeDisExplanation.html",
+    "href": "SizeDisExplanation.html",
+    "title": "4  Yong-of-the-year (YOY) Brook Trout (Salvelinus fontinalis) Body Size Model",
+    "section": "",
+    "text": "5 Background",
+    "crumbs": [
+      "<span class='chapter-number'>4</span>  <span class='chapter-title'>Yong-of-the-year (YOY) Brook Trout (*Salvelinus fontinalis*) Body Size Model</span>"
+    ]
+  },
+  {
+    "objectID": "SizeDisExplanation.html#questions",
+    "href": "SizeDisExplanation.html#questions",
+    "title": "4  Yong-of-the-year (YOY) Brook Trout (Salvelinus fontinalis) Body Size Model",
+    "section": "5.1 Questions",
+    "text": "5.1 Questions\nAlthough there are a lot of variables like, food availability, habitat, flow and temperature all influenceing body size. I want to look at it through the lenses of two variables.\n\nWhat effect does growth rate have on brook trout YOY body size?\nWhat effect does emergence date ( birth ) have on brook trout YOY body size?",
+    "crumbs": [
+      "<span class='chapter-number'>4</span>  <span class='chapter-title'>Yong-of-the-year (YOY) Brook Trout (*Salvelinus fontinalis*) Body Size Model</span>"
+    ]
+  },
+  {
+    "objectID": "SizeDisExplanation.html#study-structure",
+    "href": "SizeDisExplanation.html#study-structure",
+    "title": "4  Yong-of-the-year (YOY) Brook Trout (Salvelinus fontinalis) Body Size Model",
+    "section": "5.2 Study Structure",
+    "text": "5.2 Study Structure\n\nConceptual Models\nOtolith Growth Rate Methodology\nStream Data",
+    "crumbs": [
+      "<span class='chapter-number'>4</span>  <span class='chapter-title'>Yong-of-the-year (YOY) Brook Trout (*Salvelinus fontinalis*) Body Size Model</span>"
+    ]
+  },
+  {
+    "objectID": "SizeDisExplanation.html#simulated-data",
+    "href": "SizeDisExplanation.html#simulated-data",
+    "title": "4  Yong-of-the-year (YOY) Brook Trout (Salvelinus fontinalis) Body Size Model",
+    "section": "6.1 Simulated Data",
+    "text": "6.1 Simulated Data\n\nSame Emergence Date - Different Growth RateDifferent Emergence Date - Same Growth RateDifferent Emergence Date - Different Growth Rate\n\n\n\n\n[1] \"Same Emergence/Diff Growth\"",
+    "crumbs": [
+      "<span class='chapter-number'>4</span>  <span class='chapter-title'>Yong-of-the-year (YOY) Brook Trout (*Salvelinus fontinalis*) Body Size Model</span>"
+    ]
+  },
+  {
+    "objectID": "SizeDisExplanation.html#simulated-data-effect-on-body-size",
+    "href": "SizeDisExplanation.html#simulated-data-effect-on-body-size",
+    "title": "4  Yong-of-the-year (YOY) Brook Trout (Salvelinus fontinalis) Body Size Model",
+    "section": "6.2 Simulated Data effect on Body Size",
+    "text": "6.2 Simulated Data effect on Body Size\n\nGrowth Rate Vs Body SizeEmergence Date Vs Body Size",
+    "crumbs": [
+      "<span class='chapter-number'>4</span>  <span class='chapter-title'>Yong-of-the-year (YOY) Brook Trout (*Salvelinus fontinalis*) Body Size Model</span>"
+    ]
+  },
+  {
+    "objectID": "SizeDisExplanation.html#avery-brook-size-distribution-vs-emergence-date-2022-07-21",
+    "href": "SizeDisExplanation.html#avery-brook-size-distribution-vs-emergence-date-2022-07-21",
+    "title": "4  Yong-of-the-year (YOY) Brook Trout (Salvelinus fontinalis) Body Size Model",
+    "section": "7.1 Avery Brook Size Distribution vs Emergence Date (2022-07-21)",
+    "text": "7.1 Avery Brook Size Distribution vs Emergence Date (2022-07-21)",
+    "crumbs": [
+      "<span class='chapter-number'>4</span>  <span class='chapter-title'>Yong-of-the-year (YOY) Brook Trout (*Salvelinus fontinalis*) Body Size Model</span>"
+    ]
+  },
+  {
+    "objectID": "SizeDisExplanation.html#conclusions",
+    "href": "SizeDisExplanation.html#conclusions",
+    "title": "4  Yong-of-the-year (YOY) Brook Trout (Salvelinus fontinalis) Body Size Model",
+    "section": "7.2 Conclusions",
+    "text": "7.2 Conclusions\n\nBrook Trout Length and Growth Rate are highly correlated.\nNeed an independent measure of growth rate.\nUse otolith ring spacing to estimate daily growth rate.",
+    "crumbs": [
+      "<span class='chapter-number'>4</span>  <span class='chapter-title'>Yong-of-the-year (YOY) Brook Trout (*Salvelinus fontinalis*) Body Size Model</span>"
+    ]
+  },
+  {
+    "objectID": "SizeDisExplanation.html#steps",
+    "href": "SizeDisExplanation.html#steps",
+    "title": "4  Yong-of-the-year (YOY) Brook Trout (Salvelinus fontinalis) Body Size Model",
+    "section": "8.1 Steps",
+    "text": "8.1 Steps\n\nDetermine the relationship between brook trout fork length and otolith size.\nAccess the daily body size estimates from ring spacing measurements.\nApply methodology to one stream from one year.",
+    "crumbs": [
+      "<span class='chapter-number'>4</span>  <span class='chapter-title'>Yong-of-the-year (YOY) Brook Trout (*Salvelinus fontinalis*) Body Size Model</span>"
+    ]
+  },
+  {
+    "objectID": "SizeDisExplanation.html#otolith-radius-vs-body-size",
+    "href": "SizeDisExplanation.html#otolith-radius-vs-body-size",
+    "title": "4  Yong-of-the-year (YOY) Brook Trout (Salvelinus fontinalis) Body Size Model",
+    "section": "8.2 Otolith Radius vs Body Size",
+    "text": "8.2 Otolith Radius vs Body Size\n\n\n\n\n\n\n\n\n\n\nThere is a positive relationship between otolith radius and fork length.\n\nR Squared = 0.92\n\nWe conducted a mixed effects model analysis to determine whether the sampled stream and year could explain the variance. Unfortunately, the random effects only contributed a minimal amount to the overall variance.",
+    "crumbs": [
+      "<span class='chapter-number'>4</span>  <span class='chapter-title'>Yong-of-the-year (YOY) Brook Trout (*Salvelinus fontinalis*) Body Size Model</span>"
+    ]
+  },
+  {
+    "objectID": "SizeDisExplanation.html#ring-spacing-methodology",
+    "href": "SizeDisExplanation.html#ring-spacing-methodology",
+    "title": "4  Yong-of-the-year (YOY) Brook Trout (Salvelinus fontinalis) Body Size Model",
+    "section": "8.3 Ring Spacing Methodology",
+    "text": "8.3 Ring Spacing Methodology\n\nA sagittal otolith is divided into four quadrants.\n\nPosterior-Ventral\nPosterior-Dorsal\nAnterior-Ventral\nAnterior-Dorsal\n\nAll Counting was done in the Posterior-Dorsal Quadrant.\n\n\n\nRing spacing is measured along a 45 degree angle in the Posterior-Dorsal Quadrant\n\nStarting at the Posterior most primordia of the primordium.\nEnding at the edge of the Otolith.\n\nThis ensures consistent measurements among samples.\n\n\n\n\nPosterior-Dorsal Quadrant with Counting Line\n\n\n\nThe distance between every consecutive ring was measured starting at the edge and ending at the posterior primordium.\nThe distances between the consecutive rings were used to calculate the otolith radius when the ring was formed.\nThe otolith radius is then run through a linear equation to calculate the Fishes Fork Length for a given rings size.\n\n\n\n\nZoomed in Posterior-Dorsal Quadrant.",
+    "crumbs": [
+      "<span class='chapter-number'>4</span>  <span class='chapter-title'>Yong-of-the-year (YOY) Brook Trout (*Salvelinus fontinalis*) Body Size Model</span>"
+    ]
+  },
+  {
+    "objectID": "SizeDisExplanation.html#error-checking",
+    "href": "SizeDisExplanation.html#error-checking",
+    "title": "4  Yong-of-the-year (YOY) Brook Trout (Salvelinus fontinalis) Body Size Model",
+    "section": "8.4 Error Checking",
+    "text": "8.4 Error Checking\n\n8.4.1 Ring Measuring Error\n\nCheck for reader bias.\nMeasure ring spacing and calculate estimated body size for Ten otolith blindly.\nCompare the size estimates and calculate the percent error in them.\nPercent Error should be below 10%.\nTwo out of Ten percent error over 10%.\n\n\nGraphResults",
+    "crumbs": [
+      "<span class='chapter-number'>4</span>  <span class='chapter-title'>Yong-of-the-year (YOY) Brook Trout (*Salvelinus fontinalis*) Body Size Model</span>"
+    ]
   }
 ]
