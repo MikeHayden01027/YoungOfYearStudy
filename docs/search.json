@@ -54,7 +54,7 @@
     "href": "variationInEmergenceTiming.html#question-2.",
     "title": "2  Spatial and Temporal Emergence Timing of Young-of-Year (YOY) Brook Trout (Salvelinus fontinalis)",
     "section": "7.2 Question 2.",
-    "text": "7.2 Question 2.\n\nThere is spatial and temporal variation in emergence timing within and among sites.\nTo what degree does mean daily stream temperature influence the spatial and temporal variation in emergence timing within and among sites.\n\n\n7.2.1 Spatial and Temporal Variation in Temperature accross rivers\n\nSpatial Variation Water Temperature ( Average Day/Stream )Temporal Variation Water Temperature ( Average Day/Stream )Spatial and Temporal Variation Water Temperature ( Average Day/Stream )\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n7.2.2 Maximum Cumulative Degree Days ( Spatial and Temporal )\n\n\n\n\n\n\n\n\n\n\n\n7.2.3 Predicted Emergence (Otolith) vs Observed Emergence (Dip Net)\n\n\n\n\n\n\n\n\n\n\n\n7.2.4 Stream Temperature vs Dip Net Estimated Emergence",
+    "text": "7.2 Question 2.\n\nThere is spatial and temporal variation in emergence timing within and among sites.\nTo what degree does mean daily stream temperature influence the spatial and temporal variation in emergence timing within and among sites.\n\n\n7.2.1 Spatial and Temporal Variation in Temperature accross rivers\n\nSpatial Variation Water Temperature ( Average Day/Stream )Temporal Variation Water Temperature ( Average Day/Stream )Spatial and Temporal Variation Water Temperature ( Average Day/Stream )\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n7.2.2 Maximum Cumulative Degree Days ( Spatial and Temporal )\n\n\n\n\n\n\n\n\n\n\n\n7.2.3 Predicted Emergence (Otolith) vs Observed Emergence (Dip Net)\n\n\n\n\n\n\n\n\n\n\n\n7.2.4 Stream Temperature vs Dip Net Estimated Emergence (By Site)",
     "crumbs": [
       "<span class='chapter-number'>2</span>  <span class='chapter-title'>Spatial and Temporal Emergence Timing of Young-of-Year (YOY) Brook Trout (Salvelinus fontinalis)</span>"
     ]
@@ -144,7 +144,7 @@
     "href": "SizeDisExplanation.html#questions",
     "title": "4  Yong-of-the-year (YOY) Brook Trout (Salvelinus fontinalis) Body Size Model",
     "section": "5.1 Questions",
-    "text": "5.1 Questions\nAlthough there are a lot of variables like, food availability, habitat, flow and temperature all influenceing body size. I want to look at it through the lenses of two variables.\n\nWhat effect does growth rate have on brook trout YOY body size?\nWhat effect does emergence date ( birth ) have on brook trout YOY body size?",
+    "text": "5.1 Questions\nAlthough there are a lot of variables such as, food availability, habitat, flow and temperature all influencing body size. We want to look at how Emergence Date (Birth date) and Growth Rate influence the broad size distribution of YOY brook trout observed in the fall.\n\nWhat effect does growth rate have on brook trout YOY body size?\nWhat effect does emergence date ( birth ) have on brook trout YOY body size?",
     "crumbs": [
       "<span class='chapter-number'>4</span>  <span class='chapter-title'>Yong-of-the-year (YOY) Brook Trout (*Salvelinus fontinalis*) Body Size Model</span>"
     ]
@@ -193,8 +193,8 @@
     "objectID": "SizeDisExplanation.html#conclusions",
     "href": "SizeDisExplanation.html#conclusions",
     "title": "4  Yong-of-the-year (YOY) Brook Trout (Salvelinus fontinalis) Body Size Model",
-    "section": "7.2 Conclusions",
-    "text": "7.2 Conclusions\n\nBrook Trout Length and Growth Rate are highly correlated.\nNeed an independent measure of growth rate.\nUse otolith ring spacing to estimate daily growth rate.",
+    "section": "7.3 Conclusions",
+    "text": "7.3 Conclusions\n\nBrook Trout Length and Growth Rate are highly correlated.\nNeed an independent measure of growth rate.\nUse otolith ring spacing to estimate daily growth rate.",
     "crumbs": [
       "<span class='chapter-number'>4</span>  <span class='chapter-title'>Yong-of-the-year (YOY) Brook Trout (*Salvelinus fontinalis*) Body Size Model</span>"
     ]
@@ -234,7 +234,67 @@
     "href": "SizeDisExplanation.html#error-checking",
     "title": "4  Yong-of-the-year (YOY) Brook Trout (Salvelinus fontinalis) Body Size Model",
     "section": "8.4 Error Checking",
-    "text": "8.4 Error Checking\n\n8.4.1 Ring Measuring Error\n\nCheck for reader bias.\nMeasure ring spacing and calculate estimated body size for Ten otolith blindly.\nCompare the size estimates and calculate the percent error in them.\nPercent Error should be below 10%.\nTwo out of Ten percent error over 10%.\n\n\nGraphResults",
+    "text": "8.4 Error Checking\n\n8.4.1 Ring Measuring Error\n\nCheck for reader bias.\nMeasure ring spacing and calculate estimated body size for Ten otolith blindly.\nCompare the size estimates and calculate the percent error in them.\nPercent Error should be below 10%.\nTwo out of Ten percent error over 10%.\n\n\nGraphPercent Error\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\nCode\n# -------------------------------------------------\n# Extract All fish that were ring space aged twice. \n# -------------------------------------------------\n\nuni &lt;- growthRateOtolith %&gt;% filter( counts == 2, \n                                     lengthAtAgeFL &gt; 0 )\nuni &lt;- unique(uni$slideNumber)\n\nsecondCount &lt;- growthRateOtolith %&gt;% \n               filter(slideNumber %in% uni) %&gt;% \n               mutate(dOY = yday(date))\n\n# --------------------------------------\n# Data Frame Fish ring spaced aged twice\n# --------------------------------------\n\nsecondCounts &lt;- uni %&gt;% as.data.frame()\n                       colnames(secondCounts)[1] = \"slideNumber\"\n               \n# --------------------------\n# Nest Data for map function\n# --------------------------\n\n\nnestedData &lt;- secondCounts %&gt;% group_by(slideNumber) %&gt;% \n                               nest() \n                       \n \npercentErrorBackCalculate &lt;- nestedData %&gt;% mutate( percentError = map( slideNumber,  \n                                                                        otolithPercentError ) ) %&gt;% \n                                            unnest()\n \n# ---------------------------------\n# Plot Percent Error with Histagram\n# --------------------------------\n\n\npercentErrorBackCalculate %&gt;% ggplot(aes( x = percentError )) + \n                               geom_histogram(aes( y = ..density..),\n                                                   colour = 1, fill = \"white\") +\n                               geom_density( lwd = 1, \n                                             colour = 4,\n                                             fill = 4, \n                                             alpha = 0.25) +\n                               labs( y = \"Density\" , x = \"Percent Error\") +\n                               theme_Publication()",
+    "crumbs": [
+      "<span class='chapter-number'>4</span>  <span class='chapter-title'>Yong-of-the-year (YOY) Brook Trout (*Salvelinus fontinalis*) Body Size Model</span>"
+    ]
+  },
+  {
+    "objectID": "SizeDisExplanation.html#models",
+    "href": "SizeDisExplanation.html#models",
+    "title": "4  Yong-of-the-year (YOY) Brook Trout (Salvelinus fontinalis) Body Size Model",
+    "section": "6.1 Models",
+    "text": "6.1 Models\n\nSame Emergence Date - Different Growth Rate ( SE/DG), model assumes the growth rate varies among individuals but they emerge at the same time. The largest YOY grew the fastest and the smallest YOY grew the slowest.\nDifferent Emergence Date - Same Growth Rate (DE/SG), assumes the growth rate remains the same but the emergence time varies among individuals. The earliest emerges become the largest YOY and the later emerges become the smallest YOY.\nDifferent Emergence Date and Growth Rate (Mix), assumes that both growth rate and emergence date vary among individuals with each one contributing the the size variation observed in the fall. Hypothetically a YOY can emerge later, but into a more favorable environment thus grow faster and become one of the larger YOY in the fall.",
+    "crumbs": [
+      "<span class='chapter-number'>4</span>  <span class='chapter-title'>Yong-of-the-year (YOY) Brook Trout (*Salvelinus fontinalis*) Body Size Model</span>"
+    ]
+  },
+  {
+    "objectID": "SizeDisExplanation.html#simulated-data-visual",
+    "href": "SizeDisExplanation.html#simulated-data-visual",
+    "title": "4  Yong-of-the-year (YOY) Brook Trout (Salvelinus fontinalis) Body Size Model",
+    "section": "6.2 Simulated Data ( Visual )",
+    "text": "6.2 Simulated Data ( Visual )\n\nFirst, we display body size on the y-axis and time on the x-axis. Based off field observations 20mm is assumed to be the body size brook trout YOY emerge at. This allows use to visually look what real data would look like for each model.\n\n\nSame Emergence Date - Different Growth RateDifferent Emergence Date - Same Growth RateDifferent Emergence Date and Growth Rate\n\n\n\n\n\n\n\nA concptural model of Same Emergence Date - Different Growth Rate on spring growth period for YOY brook trout. Fork Length (mm) on the y axis and Emergence Date (Day of Year) on the x axis.\n\n\n\n\n\n\n\n\n\n\n\nA concptural model of Different Emergence Date - Same Growth Rate on spring growth period for YOY brook trout. Fork Length (mm) on the y axis and Emergence Date (Day of Year) on the x axis.\n\n\n\n\n\n\n\n\n\n\n\nA concptural model of Different Emergence Date and Growth Rate on spring growth period for YOY brook trout. Fork Length (mm) on the y axis and Emergence Date (Day of Year) on the x axis.",
+    "crumbs": [
+      "<span class='chapter-number'>4</span>  <span class='chapter-title'>Yong-of-the-year (YOY) Brook Trout (*Salvelinus fontinalis*) Body Size Model</span>"
+    ]
+  },
+  {
+    "objectID": "SizeDisExplanation.html#simulated-data-model",
+    "href": "SizeDisExplanation.html#simulated-data-model",
+    "title": "4  Yong-of-the-year (YOY) Brook Trout (Salvelinus fontinalis) Body Size Model",
+    "section": "6.3 Simulated Data ( Model )",
+    "text": "6.3 Simulated Data ( Model )\n\nGrowth Rate Vs Body SizeEmergence Date Vs Body Size\n\n\n\n\n\n\n\nThe effect of Growth Rate (Independent Variable) x-axis or Fork Length (mm) (Dependent Variable) y-axis , colored by model. Model are, DE/SG (Different Emergence - Same Growth Rate), Mix = (Different Emergence Date and Growth Rate), and SE/DG (Same Emergence Date and Different Growth Rate)\n\n\n\n\n\n\n\n\n\n\n\nThe effect of Emergence Date (Independent Variable) x-axis or Fork Length (mm) (Dependent Variable) y-axis , colored by model. Model are, DE/SG (Different Emergence - Same Growth Rate), Mix = (Different Emergence Date and Growth Rate), and SE/DG (Same Emergence Date and Different Growth Rate)",
+    "crumbs": [
+      "<span class='chapter-number'>4</span>  <span class='chapter-title'>Yong-of-the-year (YOY) Brook Trout (*Salvelinus fontinalis*) Body Size Model</span>"
+    ]
+  },
+  {
+    "objectID": "SizeDisExplanation.html#avery-brook",
+    "href": "SizeDisExplanation.html#avery-brook",
+    "title": "4  Yong-of-the-year (YOY) Brook Trout (Salvelinus fontinalis) Body Size Model",
+    "section": "7.1 Avery Brook",
+    "text": "7.1 Avery Brook\n\nSize Distribution vs Emergence Date (2022-07-21)Fork Length vs Emergence Date (2022-07-21)Fork Length (mm) vs Growth Rate (mm/d)\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\nThe effect of Emergence Date (Independent Variable) x-axis or Fork Length (mm) (Dependent Variable) y-axis , colored by model. The data is from Avery Brook Summer electrofishing sample July 21st 2022\n\n\n\n\n\n\n\n\n\n\n\nThe effect of Emergence Date (Independent Variable) x-axis or Fork Length (mm) (Dependent Variable) y-axis , colored by model. The data is from Avery Brook Summer electrofishing sample July 21st 2022\n\n\n\n\n\nCall:\nlm(formula = forkLength_DateKilled ~ slope, data = new)\n\nResiduals:\n     Min       1Q   Median       3Q      Max \n-1.89739 -1.11063 -0.00066  1.13793  2.29610 \n\nCoefficients:\n            Estimate Std. Error t value Pr(&gt;|t|)    \n(Intercept)   17.082      3.664   4.663  0.00231 ** \nslope         89.480      8.218  10.888 1.22e-05 ***\n---\nSignif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1\n\nResidual standard error: 1.582 on 7 degrees of freedom\nMultiple R-squared:  0.9442,    Adjusted R-squared:  0.9363 \nF-statistic: 118.5 on 1 and 7 DF,  p-value: 1.218e-05",
+    "crumbs": [
+      "<span class='chapter-number'>4</span>  <span class='chapter-title'>Yong-of-the-year (YOY) Brook Trout (*Salvelinus fontinalis*) Body Size Model</span>"
+    ]
+  },
+  {
+    "objectID": "SizeDisExplanation.html#obear-brook-upper",
+    "href": "SizeDisExplanation.html#obear-brook-upper",
+    "title": "4  Yong-of-the-year (YOY) Brook Trout (Salvelinus fontinalis) Body Size Model",
+    "section": "7.2 Obear Brook Upper",
+    "text": "7.2 Obear Brook Upper\n\nSize Distribution vs Emergence Date (2022-07-21)Fork Length vs Emergence Date (2022-07-21)Fork Length (mm) vs Growth Rate (mm/d)\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\nThe effect of Emergence Date (Independent Variable) x-axis or Fork Length (mm) (Dependent Variable) y-axis , colored by model. The data is from Avery Brook Summer electrofishing sample July 21st 2022\n\n\n\n\n\n\n\n\n\n\n\nThe effect of Emergence Date (Independent Variable) x-axis or Fork Length (mm) (Dependent Variable) y-axis , colored by model. The data is from Obear Brook Summer electrofishing sample July 15th 2015",
+    "crumbs": [
+      "<span class='chapter-number'>4</span>  <span class='chapter-title'>Yong-of-the-year (YOY) Brook Trout (*Salvelinus fontinalis*) Body Size Model</span>"
+    ]
+  },
+  {
+    "objectID": "SizeDisExplanation.html#results-conclusions",
+    "href": "SizeDisExplanation.html#results-conclusions",
+    "title": "4  Yong-of-the-year (YOY) Brook Trout (Salvelinus fontinalis) Body Size Model",
+    "section": "7.3 Results / Conclusions",
+    "text": "7.3 Results / Conclusions\n\nFork Length (mm) vs Emergence Date\n\nAvery Brook Summer 2022 - R Squared 0.34\nObear Brook Summer 2015 - R Squared 0.27\n\nFork Length (mm) against Growth Rate (mm/d)\n\nAvery Brook Summer 2022 - R Squared 0.93\nObear Brook Summer 2015 - R Squared 1.00\n\nGrowth Rate had a stronger relationship than emergence date but the data is highly correlated so we need a different way to estimate growth rate to account for the daily variation.",
     "crumbs": [
       "<span class='chapter-number'>4</span>  <span class='chapter-title'>Yong-of-the-year (YOY) Brook Trout (*Salvelinus fontinalis*) Body Size Model</span>"
     ]
