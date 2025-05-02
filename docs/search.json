@@ -298,5 +298,35 @@
     "crumbs": [
       "<span class='chapter-number'>4</span>  <span class='chapter-title'>Yong-of-the-year (YOY) Brook Trout (*Salvelinus fontinalis*) Body Size Model</span>"
     ]
+  },
+  {
+    "objectID": "SizeDisExplanation.html#fork-length-at-capture-mm-vs-growth-rate-mmd",
+    "href": "SizeDisExplanation.html#fork-length-at-capture-mm-vs-growth-rate-mmd",
+    "title": "4  Yong-of-the-year (YOY) Brook Trout (Salvelinus fontinalis) Body Size Model",
+    "section": "9.1 Fork Length at Capture (mm) vs Growth Rate (mm/d)",
+    "text": "9.1 Fork Length at Capture (mm) vs Growth Rate (mm/d)\n\n\nCode\naveryGrowth &lt;- growthRateOtolith %&gt;% filter( river == \"Obear Brook\" ,\n                                             lengthAtAgeBI &gt; 20) %&gt;% \n                                     mutate( dayOfYear = yday(date), \n                                             year = year(date))\n\naveryGrowth %&gt;% filter( methodOfCapture == \"Electrofisher\" ) %&gt;%\n                ggplot( aes( y = changeInSize, \n                             x = forkLength, \n                             colour = dayOfYear)) + \n                #geom_smooth(method = \"gam\") \n                geom_point() +\n                labs( y = \"Fork Length (mm)\",\n                      x = \"Date\" , \n                      colour = \"Fish Number\" ) +\n                #scale_colour_Publication() +\n                theme_Publication() \n\n\n\n\n\n\n\n\n\nCode\n               # facet_wrap(.~year)\n\naveryGrowth %&gt;% filter( methodOfCapture == \"Electrofisher\") %&gt;%\n                ggplot(aes( y = changeInSize, \n                            x = lengthAtAgeFL, \n                            colour = as.factor(slideNumber))) + \n                 #geom_point() +\n                 #geom_line() \n                 labs( y = \"Growth Rate (mm/day)\" , \n                       x = \"Predicted Fork Length\" ,\n                       colour = \"Fish Number\") +\n                 geom_smooth(method = \"lm\", se = F) + \n                # facet_wrap(.~year) \n                 theme_Publication() + \n                 scale_colour_Publication() \n\n\n\n\n\n\n\n\n\nCode\ncc &lt;- growthRateOtolith %&gt;% filter( river %in% c( \"Avery Brook\" , \n                                                  \"Obear Brook\" , \n                                                  \"Sanderson Brook\",\n                                                  \"West Whately Brook\", \n                                                  \"Roaring Brook\")) %&gt;%\n                            mutate( year = year(dateKilled) ) %&gt;%\n                            group_by( river, \n                                      slideNumber, \n                                      forkLength, \n                                      year) %&gt;%\n                            summarise( mean = mean(changeInSize) )\n\ncc %&gt;% ggplot(aes( y = mean,\n                   x = forkLength)) + \n        geom_point() + \n        xlim( 18 , 80) +\n        ylim(0.1 , 0.5) +\n        geom_smooth(method = \"lm\" , \n                    se = FALSE) +\n        stat_poly_line() +\n        stat_cor(label.y = 0.45)+\n        labs( y = \"Average Change in Length (mm/day)\" , \n              x = \"Fork Length (mm) at Capture\" ) +\n        theme_Publication() +\n        scale_colour_Publication()",
+    "crumbs": [
+      "<span class='chapter-number'>4</span>  <span class='chapter-title'>Yong-of-the-year (YOY) Brook Trout (*Salvelinus fontinalis*) Body Size Model</span>"
+    ]
+  },
+  {
+    "objectID": "SizeDisExplanation.html#raw-data",
+    "href": "SizeDisExplanation.html#raw-data",
+    "title": "4  Yong-of-the-year (YOY) Brook Trout (Salvelinus fontinalis) Body Size Model",
+    "section": "9.1 Raw Data",
+    "text": "9.1 Raw Data\n\n9.1.1 Avery Brook\n\n9.1.1.1 Change in size accross Time (2022)\n\n\n\n\n\n\n\n\n\n\n\n9.1.1.2 Daily Growth Rate\n\nDip NetElectrofisher",
+    "crumbs": [
+      "<span class='chapter-number'>4</span>  <span class='chapter-title'>Yong-of-the-year (YOY) Brook Trout (*Salvelinus fontinalis*) Body Size Model</span>"
+    ]
+  },
+  {
+    "objectID": "SizeDisExplanation.html#analyzed-data",
+    "href": "SizeDisExplanation.html#analyzed-data",
+    "title": "4  Yong-of-the-year (YOY) Brook Trout (Salvelinus fontinalis) Body Size Model",
+    "section": "9.2 Analyzed Data",
+    "text": "9.2 Analyzed Data\n\n9.2.1 Fork Length (mm) vs Growth Rate (mm/d)",
+    "crumbs": [
+      "<span class='chapter-number'>4</span>  <span class='chapter-title'>Yong-of-the-year (YOY) Brook Trout (*Salvelinus fontinalis*) Body Size Model</span>"
+    ]
   }
 ]
